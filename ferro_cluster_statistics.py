@@ -63,10 +63,6 @@ def compute_vec_periodic(point1,point2, box_dimensions):
     distance = point2-point1
     abs_dist = np.abs(distance)
     alt_dist = (box_dimensions-abs_dist)*np.sign(distance)*-1
-#     print(distance)
-#     print(box_dimensions-np.abs(distance))
-#     print(np.where(abs_dist <= box_dimensions-abs_dist, distance, alt_dist))
-#     print('\n\n')
     return np.where(abs_dist <= box_dimensions-abs_dist, distance, alt_dist)
 
 def compute_cog_periodic(points, box_dimensions):
@@ -187,16 +183,11 @@ def calc_centrosymmetry_props_3d(nsteps,phi,charge_frac,test,trajnr):
     avg_centrosymmetry_std = np.zeros(nsteps)
     centrosymmetry_vals=np.zeros(n_DA*nsteps) #array to contain all of the different P values for each chromophore calculated in each timestep
     n_centrosymmetry_vals=0 #parameter to keep track of the number of total P values we have calculated
-#     polymer_proximities=np.zeros(nsteps)
-#     electrostatic_forces=np.zeros(nsteps)
-#     avg_cos_diff = np.zeros(nsteps)
 
     #LOOP THROUGH ALL TIMESTEPS REQUESTED
     for t in range(len(u.trajectory)-nsteps+9,len(u.trajectory),5): #only perform analysis every 5 frames (based on autocorrelation data)
         
         #PERFORM CLUSTERING PROCESS
-#         if t%10==0:
-#             print(t)
         print(t)
         
         u.trajectory[t] #go to the appropriate trajectory frame
@@ -243,16 +234,6 @@ def calc_centrosymmetry_props_3d(nsteps,phi,charge_frac,test,trajnr):
                     intracluster_pos_distances=calc_dist_mat_periodic(cog_data[cl1.cluster_idx==cluster_id],u.dimensions[:3])
                     print(len(intracluster_distances[(intracluster_distances!=0) & (intracluster_pos_distances<=3.5)]))
                     relevant_intracluster_distances=intracluster_distances[(intracluster_distances!=0) & (intracluster_pos_distances<=3.5)]
-#                     for i in range(len(cog_data)):
-#                         phi_theta_diffs = np.zeros(len(dist_mat[(dist_mat>0) & (dist_mat<=3.5)]))
-#                         current_index=0
-#                         loc_dists = dist_mat[i]
-#                         relevant_data = DA_data[(loc_dists > 0) & (loc_dists <= 3.5)]
-#                         phi_theta_diffs[current_index:current_index+len(relevant_data)] = np.linalg.norm(DA_data[i] - relevant_data, axis=1)
-#                         current_index += len(relevant_data)
-#                     print('50th percentile: ', np.percentile(relevant_intracluster_distances[relevant_intracluster_distances<0.5],50))
-#                     print('90th percentile: ', np.percentile(relevant_intracluster_distances[relevant_intracluster_distances<0.5],90))
-#                     print('95th percentile: ', np.percentile(relevant_intracluster_distances[relevant_intracluster_distances<0.5],95))
             plt.title("Clusters identified", fontsize=20)
             plt.xlim(-np.pi,np.pi)
             plt.ylim(0,np.pi)
@@ -260,16 +241,6 @@ def calc_centrosymmetry_props_3d(nsteps,phi,charge_frac,test,trajnr):
             # ax.tick_params(axis="both", which="both", labelsize=14, size=8)
             plt.show()
 
-
-
-        #compute proximity data real quick
-#             polymer_positions=u.select_atoms('type 7 or type 8').positions
-#             polymer_da_distances = calc_dist_mat_periodic_2pos(polymer_positions, cog_data, u.dimensions[:3])
-#             polymer_proximities[t-(len(u.trajectory)-nsteps)] = np.sum(polymer_da_distances)/(polymer_da_distances.shape[0]*polymer_da_distances.shape[1])
-#             da_charge_positions=u.select_atoms('type 6').positions
-#             polymer_charge_positions=u.select_atoms('type 8').positions
-#             polymer_charge_distances = calc_dist_mat_periodic_2pos(polymer_charge_positions, da_charge_positions, u.dimensions[:3])
-#             electrostatic_forces[t-(len(u.trajectory)-nsteps)] = np.sum(1/polymer_charge_distances)
         #do distance-based clustering within the angle-based clusters
         final_cluster_indices = np.zeros(n_DA)
         num_clusters_found = 0
@@ -349,18 +320,8 @@ def calc_centrosymmetry_props_3d(nsteps,phi,charge_frac,test,trajnr):
             for pos in range(len(positions)):
                 sorted_distmat = np.argsort(dist_mat[pos])
                 closest_atoms=sorted_distmat[1:5]
-                #TEST: Make plots of closest positions to certain DA molecules
-#                 if pos % 50 == 0:
-#                     plt.figure(figsize=(12,10))
-#                     plt.scatter(renorm_positions[:,0]*3,renorm_positions[:,1]*3,s=5)
-#                     plt.scatter(renorm_positions[pos,0]*3,renorm_positions[pos,1]*3,s=5,color='yellow')
-#                     plt.scatter(renorm_positions[closest_atoms,0]*3,renorm_positions[closest_atoms,1]*3,s=5,color='red')
-#                     plt.xlim(-40,40)
-#                     plt.ylim(-40,40)
-#                     plt.show()
                 closest_vecs = renorm_positions[pos] - renorm_positions[closest_atoms]
                 vec_sums = np.linalg.norm(closest_vecs[:, np.newaxis, :] + closest_vecs[np.newaxis, :, :],axis=2)
-                #can we do some kind of check to make sure we aren't dealing with the edge of a cluster?
 
                 # Compute the 8 nearest neighbor distances
                 closest_neighbors=sorted_distmat[1:9]
@@ -372,8 +333,8 @@ def calc_centrosymmetry_props_3d(nsteps,phi,charge_frac,test,trajnr):
                 centro_syms[indices[pos]] = np.sum(np.sort(vec_sums_real[np.triu_indices(vec_sums_real.shape[0], k=1)])[:2]**2)
                 max_cs_val = 10
                 edge_vals[indices[pos]] = avg_distance
-                if avg_distance >= 0.4: #we ran some tests with histograms of this value and 0.42 seemed to be appropriate for the bimodal distribution of values
-#                 if avg_distance >= 0.435: #we ran some tests with histograms of this value and 0.42 seemed to be appropriate for the bimodal distribution of values
+                if avg_distance >= 0.4: #ran some tests with histograms of this value and 0.4 seemed to be appropriate for the bimodal distribution of values
+#                 if avg_distance >= 0.435: #ran some tests with histograms of this value and 0.4 seemed to be appropriate for the bimodal distribution of values
                     edge_ids[indices[pos]] = 1
                 else:
                     if centro_syms[indices[pos]] < max_cs_val:
@@ -382,9 +343,7 @@ def calc_centrosymmetry_props_3d(nsteps,phi,charge_frac,test,trajnr):
             interior_ids=interior_ids[:n_interior]
             interior_cluster_sizes[i] = len(interior_ids)
             #take the average of centrosymmetries for particles which are in the cluster and are not edges
-#             print(t, i, len(centro_syms[np.intersect1d(interior_ids,indices)]))
             if interior_cluster_sizes[i] > 0:
-#                 print(n_centrosymmetry_vals,n_centrosymmetry_vals+int(interior_cluster_sizes[i]))
                 centrosymmetry_vals[n_centrosymmetry_vals:n_centrosymmetry_vals+int(interior_cluster_sizes[i])]=centro_syms[np.intersect1d(interior_ids,indices)]
                 n_centrosymmetry_vals += int(interior_cluster_sizes[i])
                 centrosymmetries[i] = np.mean(centro_syms[np.intersect1d(interior_ids,indices)])
@@ -392,13 +351,6 @@ def calc_centrosymmetry_props_3d(nsteps,phi,charge_frac,test,trajnr):
 
             #make a printout of the large clusters
             if test and t == len(u.trajectory)-1:
-
-                #this plots the renormalized cluster positions
-#                 plt.figure(figsize=(12,10))
-#                 plt.scatter(renorm_positions[:,0]*3,renorm_positions[:,1]*3,s=5)
-#                 plt.xlim(-40,40)
-#                 plt.ylim(-40,40)
-#                 plt.show()
 
                 #rotate cluster positions to align with coordinate axis
                 rotated_cog_data = np.copy(cog_data)
@@ -417,17 +369,9 @@ def calc_centrosymmetry_props_3d(nsteps,phi,charge_frac,test,trajnr):
                 #new functionality (6/7): only show points which are in the cluster interior
                 if len(relevant_centro_syms>0):
                     plt.figure()
-    #                 plt.scatter(free_positions[:,0]*3,free_positions[:,1]*3,s=10,marker='o')
-    #                 plt.scatter(bound_positions[:,0]*3,bound_positions[:,1]*3,s=10,marker='x')
-    #                 plt.scatter(free_positions[:,0]*3,free_positions[:,1]*3,c=free_centro_syms,cmap='inferno',s=10,marker='o',vmin=0,vmax=0.12)#vmax=np.max(relevant_centro_syms))
-    #                 plt.scatter(bound_positions[:,0]*3,bound_positions[:,1]*3,c=bound_centro_syms,cmap='inferno',s=10,marker='x',vmin=0,vmax=0.12)#vmax=np.max(relevant_centro_syms))
                     plt.scatter(free_positions[:,0]*3,free_positions[:,1]*3,c=free_centro_syms,cmap='viridis',s=40,marker='o',vmin=0,vmax=5.75)#vmax=np.max(relevant_centro_syms))
                     plt.scatter(bound_positions[:,0]*3,bound_positions[:,1]*3,c=bound_centro_syms,cmap='viridis',s=40,marker='x',vmin=0,vmax=5.75)#vmax=np.max(relevant_centro_syms))
-    #                 plt.scatter(free_positions[:,0]*3,free_positions[:,1]*3,c=free_centro_syms,cmap='viridis',s=10,marker='o',vmin=0,vmax=0.25)
-    #                 plt.scatter(bound_positions[:,0]*3,bound_positions[:,1]*3,c=bound_centro_syms,cmap='viridis',s=10,marker='x',vmin=0,vmax=0.25)
                     plt.colorbar(label='Centrosymmetry Parameter ($\AA$)')
-                    #ax = plt.gca()
-                    #ax.set_facecolor((210/256,210/256,210/256))
                     plt.xlabel('Position ($\AA$)')
                     plt.ylabel('Position ($\AA$)')
                     plt.savefig(f'C:\\Users\\nicho\\Documents\\Science\\ferroelectricity project\\figures\\heatmaps\\heatmap_phi_{phi}_chargefrac_{charge_frac}_run_{trajnr}_cluster_{i}.svg',format='svg',transparent=True)
@@ -437,14 +381,10 @@ def calc_centrosymmetry_props_3d(nsteps,phi,charge_frac,test,trajnr):
                     plt.figure()
                     plt.scatter(free_positions[:,0]*3,free_positions[:,1]*3,c='blue',marker='o',label='Internal Chromophores')
                     plt.scatter(bound_positions[:,0]*3,bound_positions[:,1]*3,c='blue',marker='o')
-    #                 plt.scatter(free_positions[:,0]*3,free_positions[:,1]*3,c=free_centro_syms,cmap='viridis',s=10,marker='o',vmin=0,vmax=0.08)
-    #                 plt.scatter(bound_positions[:,0]*3,bound_positions[:,1]*3,c=bound_centro_syms,cmap='viridis',s=10,marker='x',vmin=0,vmax=0.08)
                     plt.scatter(edge_positions[:,0]*3,edge_positions[:,1]*3,c='red',marker='o',label='Edge Chromophores')
-#                     plt.colorbar(label='Centrosymmetry Parameter ($\AA$)')
                     plt.legend()
                     plt.xlabel('Position ($\AA$)')
                     plt.ylabel('Position ($\AA$)')
-                    # plt.savefig(f'C:\\Users\\nicho\\Documents\\Science\\ferroelectricity project\\figures\\edgemap_phi_{phi}_chargefrac_{charge_frac}_run_{trajnr}_cluster_{i}.svg',format='svg',transparent=True)
                     plt.show()
                     #below histogram is for edge detection purposes only
                     plt.figure()
@@ -465,8 +405,6 @@ def calc_centrosymmetry_props_3d(nsteps,phi,charge_frac,test,trajnr):
             avg_centrosymmetry_std[t-(len(u.trajectory)-nsteps)] = -1
 
     centrosymmetry_vals=centrosymmetry_vals[:n_centrosymmetry_vals]
-#         adr=fr'C:\Users\nicho\Documents\Science\ferroelectricity project\p_values_phi_{phi}.dat'
-#         np.savetxt(adr,centrosymmetry_vals,fmt='%.6f')
 
     #show histogram of centrosymmetry values
     plt.figure()
@@ -596,16 +534,6 @@ def calc_integration(nsteps,phi,charge_frac,test,trajnr):
                     intracluster_pos_distances=calc_dist_mat_periodic(cog_data[cl1.cluster_idx==cluster_id],u.dimensions[:3])
                     print(len(intracluster_distances[(intracluster_distances!=0) & (intracluster_pos_distances<=3.5)]))
                     relevant_intracluster_distances=intracluster_distances[(intracluster_distances!=0) & (intracluster_pos_distances<=3.5)]
-#                     for i in range(len(cog_data)):
-#                         phi_theta_diffs = np.zeros(len(dist_mat[(dist_mat>0) & (dist_mat<=3.5)]))
-#                         current_index=0
-#                         loc_dists = dist_mat[i]
-#                         relevant_data = DA_data[(loc_dists > 0) & (loc_dists <= 3.5)]
-#                         phi_theta_diffs[current_index:current_index+len(relevant_data)] = np.linalg.norm(DA_data[i] - relevant_data, axis=1)
-#                         current_index += len(relevant_data)
-#                     print('50th percentile: ', np.percentile(relevant_intracluster_distances[relevant_intracluster_distances<0.5],50))
-#                     print('90th percentile: ', np.percentile(relevant_intracluster_distances[relevant_intracluster_distances<0.5],90))
-#                     print('95th percentile: ', np.percentile(relevant_intracluster_distances[relevant_intracluster_distances<0.5],95))
             plt.title("Clusters identified", fontsize=20)
             plt.xlim(-np.pi,np.pi)
             plt.ylim(0,np.pi)
@@ -678,7 +606,6 @@ def calc_integration(nsteps,phi,charge_frac,test,trajnr):
                         if coassembly_vals[i]==0:
                             coassembly_vals[i] = 1
                     da_func_id += 1
-#             print(f'cluster ids: {da_cluster_ids}')
             for j in range(nseg):
                 if da_cluster_ids[j] == da_cluster_ids[j+1]:
                     n_connected_seg += 1
@@ -686,9 +613,6 @@ def calc_integration(nsteps,phi,charge_frac,test,trajnr):
         incorporation_fractions[t-(len(u.trajectory)-nsteps)] = n_incorporated_chromophores / (n_polymer*n_func)
         coassembly_fractions[t-(len(u.trajectory)-nsteps)] = np.mean(coassembly_vals)
     
-#     times=np.linspace(0,nsteps-1,nsteps)
-#     plt.plot(times,integration_fractions)
-#     return np.mean(integration_fractions), np.std(integration_fractions), np.mean(incorporation_fractions), np.std(incorporation_fractions), np.mean(coassembly_fractions), np.std(coassembly_fractions)
     return incorporation_fractions, coassembly_fractions
     
 #THIS CALCULATES THE INTEGRATION FRACTION
@@ -721,11 +645,9 @@ def calc_integration_alt(nsteps,phi,charge_frac,test,trajnr):
     coassembly_fractions = np.zeros(nsteps//skip)
 
     #LOOP THROUGH ALL TIMESTEPS REQUESTED
-#     for t in range(len(u.trajectory)-nsteps,len(u.trajectory)):
     for t in range(0,nsteps,skip): #sample integration every 'skip' timesteps
         
         #PERFORM CLUSTERING PROCESS
-#         if t % 10 == 1:
         print(t)
         u.trajectory[t] #go to the appropriate trajectory frame
         #get resids for free DAs
@@ -771,16 +693,6 @@ def calc_integration_alt(nsteps,phi,charge_frac,test,trajnr):
                     intracluster_pos_distances=calc_dist_mat_periodic(cog_data[cl1.cluster_idx==cluster_id],u.dimensions[:3])
                     print(len(intracluster_distances[(intracluster_distances!=0) & (intracluster_pos_distances<=3.5)]))
                     relevant_intracluster_distances=intracluster_distances[(intracluster_distances!=0) & (intracluster_pos_distances<=3.5)]
-#                     for i in range(len(cog_data)):
-#                         phi_theta_diffs = np.zeros(len(dist_mat[(dist_mat>0) & (dist_mat<=3.5)]))
-#                         current_index=0
-#                         loc_dists = dist_mat[i]
-#                         relevant_data = DA_data[(loc_dists > 0) & (loc_dists <= 3.5)]
-#                         phi_theta_diffs[current_index:current_index+len(relevant_data)] = np.linalg.norm(DA_data[i] - relevant_data, axis=1)
-#                         current_index += len(relevant_data)
-#                     print('50th percentile: ', np.percentile(relevant_intracluster_distances[relevant_intracluster_distances<0.5],50))
-#                     print('90th percentile: ', np.percentile(relevant_intracluster_distances[relevant_intracluster_distances<0.5],90))
-#                     print('95th percentile: ', np.percentile(relevant_intracluster_distances[relevant_intracluster_distances<0.5],95))
             plt.title("Clusters identified", fontsize=20)
             plt.xlim(-np.pi,np.pi)
             plt.ylim(0,np.pi)
@@ -853,20 +765,13 @@ def calc_integration_alt(nsteps,phi,charge_frac,test,trajnr):
                         if coassembly_vals[i]==0:
                             coassembly_vals[i] = 1
                     da_func_id += 1
-#             print(f'cluster ids: {da_cluster_ids}')
             for j in range(nseg):
                 if da_cluster_ids[j] == da_cluster_ids[j+1]:
                     n_connected_seg += 1
-#         integration_fractions[t-(len(u.trajectory)-nsteps)] = n_connected_seg / n_total_seg
-#         incorporation_fractions[t-(len(u.trajectory)-nsteps)] = n_incorporated_chromophores / (n_polymer*n_func)
-#         coassembly_fractions[t-(len(u.trajectory)-nsteps)] = np.mean(coassembly_vals)
         integration_fractions[t//skip] = n_connected_seg / n_total_seg
         incorporation_fractions[t//skip] = n_incorporated_chromophores / (n_polymer*n_func)
         coassembly_fractions[t//skip] = np.mean(coassembly_vals)
     
-#     times=np.linspace(0,nsteps-1,nsteps)
-#     plt.plot(times,integration_fractions)
-#     return np.mean(integration_fractions), np.std(integration_fractions), np.mean(incorporation_fractions), np.std(incorporation_fractions), np.mean(coassembly_fractions), np.std(coassembly_fractions)
     print(incorporation_fractions)
     return incorporation_fractions
     
@@ -998,7 +903,6 @@ def calc_centrosymmetry_props_3d_alt(nsteps,phi,charge_frac,test,trajnr):
                     if csval < max_cs_val:
                         centrosymmetry_vals[t//skip,indices[pos]] = csval
 
-#     return centrosymmetry_vals[nsteps//(2*skip):,:]
     return centrosymmetry_vals
     
 def calc_centrosymmetry_diffs(csvals1,csvals2):
@@ -1012,4 +916,5 @@ def calc_centrosymmetry_diffs(csvals1,csvals2):
                 diffs[n_diffs]=csvals1[i,j]-csvals2[i,j]
                 n_diffs += 1
     diffs=diffs[:n_diffs]
+
     return diffs
