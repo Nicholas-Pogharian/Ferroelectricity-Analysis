@@ -1,15 +1,8 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import MDAnalysis as mda
 import scipy
 import freud
-from sklearn.neighbors import NearestNeighbors
-from scipy.stats import mannwhitneyu
-from scipy.stats import ttest_1samp
-from scipy.stats import permutation_test
-import seaborn as sns
-import matplotlib.style as style
 
 def calc_dist_mat(positions):
     """
@@ -918,3 +911,4 @@ def calc_centrosymmetry_diffs(csvals1,csvals2):
     diffs=diffs[:n_diffs]
 
     return diffs
+
