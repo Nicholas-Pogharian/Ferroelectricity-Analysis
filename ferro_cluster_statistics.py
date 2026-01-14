@@ -107,23 +107,6 @@ def calc_dist_mat_periodic_2pos(positions1, positions2, box_dimensions):
     vecdist=np.abs(np.reshape(positions1,(positions1.shape[0],1,positions1.shape[1]))-np.reshape(positions2,(1,positions2.shape[0],positions2.shape[1])))
     return np.linalg.norm(np.minimum(vecdist,box_dimensions-vecdist),axis=2)
 
-def plane_least_squares(x,y):
-    """
-    Takes a 2-dimensional input array of points (x,y) and a target array f(x,y)
-    Calculates a planar fit of the form f = a + bx + cy
-    Returns the least sum of squares
-    Inputs:
-        x: array with shape (N,2)
-        y: array with shape (N,)
-    Outputs: least sum of squares
-    """
-    #make the array of polynomial features with order 2
-    a1=np.ones((len(x),1))
-    a2=x
-    A=np.concatenate((a1,a2),axis=1)
-    sol=scipy.linalg.lstsq(A,y)
-    return np.around(sol[1],4)/len(x)
-
 def compute_gyration_tensor(x):
     """
     Compute the gyration tensor for an input array of points x
@@ -450,6 +433,7 @@ def calc_sample_correlation(nsteps,phi,charge_frac,test,trajnr):
     
     return np.reshape(corr_vals,(corr_vals.shape[0],1))
     
+
 
 
 
