@@ -8,7 +8,7 @@ The tools contained in this repository are designed to analyze molecular dynamic
 
 $$S_{mn}=\frac{1}{N}\sum_{i=1}^Nr_m^{(i)}r_n^{(i)}$$
 
-where $r_{n,m}^{(i)}$ are the $(m,n)$ components of vector $\vec{r}^{(i)}$ associated with chromophore $i$, $N$ is the number of chromophores in the sheet, and $m,n\in\{x,y,z\}$. Note that the set of positions $\vec{r}^{(i)}$ are equal to $\vec{r}^{(i,0)}-\vec{r}_{com}$ where $\vec{r}_{com}$ is the center of mass of the sheet.
+where $r_{n,m}^{(i)}$ are the $(m,n)$ components of vector $\vec{r}^{(i)}$ associated with chromophore $i$, $N$ is the number of chromophores in the sheet, and $m,n\in\{x,y,z\}$. Note that the set of positions $\vec{r}^{(i)}$ are equal to $\vec{r}^{(i,0)}-\vec{r}_{com}$.
 
 ## Dependencies
 A list of required packages can be found in 'requirements.txt'.
