@@ -12,7 +12,7 @@ where $r_{n,m}^{(i)}$ are the $(m,n)$ components of vector $\vec{r}^{(i)}$ assoc
 
 Centrosymmetries are calculated from the set of 2D coordinates $\{\vec{x}_i\}$ which are additionally normalized by interparticle distances in both principal directions. The local centrosymmetry parameter $P$ of each point is calculated as
 
-$$P=\sum_{i=1,2}|\vec{r}_i+\vec{r}\_{i+2}|^2$$
+$$P=\sum_{i=1,2}\left\lVert\vec{r}_i+\vec{r}\_{i+2}\right\rVert_2^2$$
 
 where $\vec{r}_i$ $\vec{r}\_{i+2}$ are vectors between that point and pairs of opposing nearest neighbors. Greater values of $P$ correspond to greater amounts of local symmetry breaking and greater potential for ferroelectric behavior. 
 
